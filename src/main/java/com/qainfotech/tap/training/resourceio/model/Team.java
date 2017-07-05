@@ -1,13 +1,14 @@
 package com.qainfotech.tap.training.resourceio.model;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.json.simple.JSONArray;
-
+import com.esotericsoftware.yamlbeans.YamlException;
 import com.qainfotech.tap.training.resourceio.TeamsJsonReader;
+import com.qainfotech.tap.training.resourceio.TeamsYamlReader;
 
 /**
  *
@@ -18,28 +19,25 @@ public class Team {
 	private final String name;
 	private final Integer id;
 	private final List<Individual> members;
-	
-	TeamsJsonReader rdr = new TeamsJsonReader();
-
-	@SuppressWarnings("unchecked")
-	public Team(Map<String, Object> teamMap) {
-		       this.id=Integer.parseInt(teamMap.get("id").toString());
-		     	this.name=teamMap.get("name").toString();
-		    	this.members=new ArrayList<>();
-		    	
-		    	List<Individual>arrayOfIndividuals=(new TeamsJsonReader()).getListOfIndividuals();
-		    	     	JSONArray memberArray=(JSONArray) teamMap.get("members");
-		    	     	Iterator<Individual> itr=arrayOfIndividuals.iterator();
-		    	     	while(itr.hasNext()){
-		    	     		Individual individual=itr.next();
-		    	     		for(int i=0;i<memberArray.size();i++){
-		    	     			if(individual.getId()==Integer.parseInt(memberArray.get(i).toString())){
-		    	     				this.members.add(individual);
-		    	     			}
-		    	     		}
-		    	     	}
+	TeamsYamlReader rdr=new TeamsYamlReader(); 
+	public Team(Map<String, Object> teamMap) throws FileNotFoundException, YamlException {
+		// throw new UnsupportedOperationException("Not implemented.");
+		this.name = teamMap.get("name").toString();
+		this.id = Integer.parseInt(teamMap.get("id").toString());
+		this.members=new ArrayList<>();
+    	
+    	List<Individual>arrayOfIndividuals=rdr.getListOfIndividuals();
+    	     	List memberArray=(List) teamMap.get("members");
+    	     	Iterator<Individual> itr=arrayOfIndividuals.iterator();
+    	     	while(itr.hasNext()){
+    	     		Individual individual=itr.next();
+    	     		for(int i=0;i<memberArray.size();i++){
+    	     			if(individual.getId()==Integer.parseInt(memberArray.get(i).toString())){
+    	     				this.members.add(individual);
+    	     			}
+    	     		}
+    	     	}
 	}
-	
 
 	@Override
 	public String toString() {
@@ -79,37 +77,42 @@ public class Team {
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	public List<Individual> getActiveMembers() {
-		List<Individual> s = new ArrayList<>();
-		        Iterator <Individual> itr = members.iterator();
-		        while (itr.hasNext()) {
-		             Individual ind = itr.next();
-		             if(ind.isActive()){
-		            	 s.add(ind);
-		             }
-		         }
-		 
-		         return s;
+		List<Individual> ListActiveMembers = new ArrayList<>();
+		List<Individual> allMembers = new ArrayList<>();
+		allMembers=members;
+		for(int k=0;k<members.size();k++){
+			
+			if(allMembers.get(k).isActive()){
+				//System.out.println(listOfActiveMembers.get(k));
+				ListActiveMembers.add(allMembers.get(k));
+				
+			}
+			
+		}
+		return ListActiveMembers;
+		// throw new UnsupportedOperationException("Not implemented.");
 	}
+
 	/**
 	 * get a list of individuals that are members of this team but are inactive
 	 * 
 	 * @return
 	 */
 	public List<Individual> getInactiveMembers() {
-		List<Individual> activeMembers=new ArrayList<>();
-		    	Iterator<Individual> itr=this.members.iterator();
-		     	while(itr.hasNext()){
-		     		Individual individual=itr.next();
-		     		if(!individual.isActive()){
-		     			activeMembers.add(individual);
-		     		}
-		     	}
-		     	return activeMembers;
-
-		
-
+		//throw new UnsupportedOperationException("Not implemented.");
+		List<Individual> ListInactiveMembers = new ArrayList<>();
+		List<Individual> allMembers = new ArrayList<>();
+		allMembers=members;
+		for(int k=0;k<members.size();k++){
+			
+			if(!(allMembers.get(k).isActive())){
+				//System.out.println(listOfActiveMembers.get(k));
+				ListInactiveMembers.add(allMembers.get(k));
+				
+			}
+			
+		}
+		return ListInactiveMembers;
 	}
-
 }
